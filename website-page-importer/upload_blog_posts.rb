@@ -14,6 +14,8 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
+log = CSV.open('./files/log.csv', 'w')
+
 if @nation && @basic_page_path && @page_author_id
   @counter = CSV.open(@blog_post_path, headers: true).count
   puts "Starting with #{@counter} rows"
@@ -60,16 +62,21 @@ if @nation && @basic_page_path && @page_author_id
     }
 
     api_call = create_blog_post_page(blog_post_params)
+    log << "#{count}, #{api_call.status}, #{api_call.reason}, #{external_id}".split(',') if api_call
     puts "#{api_call.status} | #{api_call.reason}"
 
-    Dir.foreach(local_target) do |filename|
-      unless filename == '.' || filename == '..' || filename == '.DS_Store'
-        encoded_image = encode_image(local_target, filename)
-          api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
-        puts "#{api_call.status} | #{api_call.reason}"
+    if api_call
+      Dir.foreach(local_target) do |filename|
+        unless filename == '.' || filename == '..' || filename == '.DS_Store'
+          encoded_image = encode_image(local_target, filename)
+            api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
+          log << "#{count}, #{api_call.status}, #{page_slug}, #{live_page_to_import}".split(',') if api_call
+          puts "#{api_call.status} | #{api_call.reason}"
+        end
       end
     end
 
+    count += 1
     puts "Finished row ##{count} | page_slug is #{page_slug}"
   end
 else

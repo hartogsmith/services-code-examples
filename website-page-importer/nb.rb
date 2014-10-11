@@ -5,9 +5,13 @@ def connect_nation(slug, token)
 end
 
 def download_images_from_site(live_page, local_target)
-  downloader = ImageDownloader::Process.new(live_page,local_target)
-  downloader.parse(:any_looks_like_image => true)
-  downloader.download()
+  begin
+    downloader = ImageDownloader::Process.new(live_page,local_target)
+    downloader.parse(:any_looks_like_image => true)
+    downloader.download()
+  rescue => e
+    puts "Link is broken, no images downloaded"
+  end
 end
 
 def fix_image_path_from_file(field)
