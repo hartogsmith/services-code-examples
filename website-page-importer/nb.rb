@@ -27,6 +27,13 @@ def create_blog_page(body)
     body)
 end
 
+def create_calendar_page(body)
+  @nation.call(
+    :calendars,
+    :create,
+    body)
+end
+
 def create_blog_post_page(body)
   @nation.call(
     :blog_posts,
