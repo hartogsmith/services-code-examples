@@ -16,9 +16,11 @@
 def set_data_paths
   @site_slug = ''
   @token = ''
-  @blog_post_path = './files/gm_news_blog_posts_sample.csv'
+  @blog_post_path = './files/file.csv'
   @blog_id = 1
-  @basic_page_path ='./files/gm_news_blog_posts_sample.csv'
+  @basic_page_path ='./files/file.csv'
+  @event_page_path ='./files/test.csv'
+  @calendar_id = 1
   @page_author_id = 1
   @offset = 0
 end

@@ -20,6 +20,27 @@ def fix_image_path_from_file(field)
   end
 end
 
+def create_blog_page(body)
+  @nation.call(
+    :blogs,
+    :create,
+    body)
+end
+
+def create_calendar_page(body)
+  @nation.call(
+    :calendars,
+    :create,
+    body)
+end
+
+def create_event_page(body)
+  @nation.call(
+    :events,
+    :create,
+    body)
+end
+
 def create_blog_post_page(body)
   @nation.call(
     :blog_posts,

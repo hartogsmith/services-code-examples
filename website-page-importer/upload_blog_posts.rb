@@ -62,7 +62,7 @@ if @nation && @basic_page_path && @page_author_id
     }
 
     api_call = create_blog_post_page(blog_post_params)
-    log << "#{count}, #{api_call.status}, #{api_call.reason}, #{external_id}".split(',') if api_call
+    log << %w(count api_call.status api_call.reason external_id) if api_call
     puts "#{api_call.status} | #{api_call.reason}"
 
     if api_call
