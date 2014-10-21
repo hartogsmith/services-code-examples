@@ -34,6 +34,13 @@ def create_calendar_page(body)
     body)
 end
 
+def create_event_page(body)
+  @nation.call(
+    :events,
+    :create,
+    body)
+end
+
 def create_blog_post_page(body)
   @nation.call(
     :blog_posts,

@@ -19,7 +19,8 @@ def set_data_paths
   @blog_post_path = './files/file.csv'
   @blog_id = 1
   @basic_page_path ='./files/file.csv'
-  @blog_page_path ='./files/file.csv'
+  @event_page_path ='./files/test.csv'
+  @calendar_id = 1
   @page_author_id = 1
   @offset = 0
 end
