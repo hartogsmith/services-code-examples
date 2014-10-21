@@ -30,7 +30,7 @@ if @nation && @basic_page_path && @page_author_id
     name = row['title']
     page_slug = "#{row['slug']}_#{Time.now.month}_#{Time.now.day}_#{Time.now.year}_#{Time.now.hour}#{Time.now.min}"
     created_at = row['created_at'] rescue Time.now
-    page_tags = row['page_tags'].to_s.split(',')
+    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
     live_page_to_import = row['external_url']
     external_id = row['external_id']
 
@@ -70,7 +70,7 @@ if @nation && @basic_page_path && @page_author_id
         unless filename == '.' || filename == '..' || filename == '.DS_Store'
           encoded_image = encode_image(local_target, filename)
             api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
-          log << "#{count}, #{api_call.status}, #{page_slug}, #{live_page_to_import}".split(',') if api_call
+          log << %w(count, api_call.status, page_slug, live_page_to_import) if api_call
           puts "#{api_call.status} | #{api_call.reason}"
         end
       end
