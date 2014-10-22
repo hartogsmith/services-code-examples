@@ -62,7 +62,7 @@ if @nation && @basic_page_path && @page_author_id
     }
 
     api_call = create_blog_post_page(blog_post_params)
-    log << %w(count api_call.status api_call.reason external_id) if api_call
+    log << [count, api_call.status, api_call.reason, api_call.body] if api_call
     puts "#{api_call.status} | #{api_call.reason}"
 
     if api_call
@@ -70,7 +70,7 @@ if @nation && @basic_page_path && @page_author_id
         unless filename == '.' || filename == '..' || filename == '.DS_Store'
           encoded_image = encode_image(local_target, filename)
             api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
-          log << %w(count, api_call.status, page_slug, live_page_to_import) if api_call
+          log << [count, api_call.status, filename, api_call.body] if api_call
           puts "#{api_call.status} | #{api_call.reason}"
         end
       end
