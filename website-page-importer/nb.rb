@@ -1,4 +1,5 @@
 require 'nationbuilder'
+require 'restclient'
 
 def connect_nation(slug, token)
   @nation = NationBuilder::Client.new(slug, token)
@@ -11,6 +12,17 @@ def download_images_from_site(live_page, local_target)
     downloader.download()
   rescue => e
     puts "Link is broken, no images downloaded"
+  end
+end
+
+def download_single_image_from_url(url_path, local_target)
+  begin
+    file_name = url_path.split('/').last
+    file = File.open("#{local_target}/#{file_name}", "wb") do |output|
+      output.write RestClient.get(url_path)
+    end
+  rescue => e
+    puts "Link is broken, no image downloaded"
   end
 end
 
@@ -53,6 +65,15 @@ def create_basic_page(body)
     :basic_pages,
     :create,
     body)
+end
+
+def find_or_create_signup_by_email(email)
+  @nation.call(
+    :people,
+    :push,
+    person: {
+      email: email
+    })
 end
 
 def upload_file(encoded_image, filename, site_slug, page_slug)

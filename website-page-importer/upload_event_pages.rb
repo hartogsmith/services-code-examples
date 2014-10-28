@@ -2,6 +2,7 @@
 
 require 'nationbuilder'
 require 'pp'
+require 'json'
 require 'csv'
 require 'nokogiri'
 require 'image_downloader'
@@ -16,7 +17,7 @@ count = 0
 
 log = CSV.open('./files/log.csv', 'w')
 
-if @nation && @event_page_path && @page_author_id
+if @nation && @event_page_path
   counter = CSV.open(@event_page_path, headers: true).count
   puts "Starting with #{counter} rows"
 
@@ -31,11 +32,16 @@ if @nation && @event_page_path && @page_author_id
     content_html = Nokogiri::HTML(row['content_html'])    
     local_target = FileUtils::mkdir_p("./images/#{page_slug}").first 
     live_page_to_import = row['external_url']
+    page_author = row['author_email']
 
-    
     download_images_from_site(live_page_to_import, local_target)
 
     fix_image_path_from_file(content_html)
+
+    # Find or creates the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
 
     event_page_params = {
       site_slug: @site_slug,
@@ -49,7 +55,7 @@ if @nation && @event_page_path && @page_author_id
         intro: content_html,
         tags: row['page_tags'].gsub(/\s+/, "").split(','),
         published_at: Time.now,
-        author_id: @page_author_id,
+        author_id: JSON.parse(author.body)['person']['id'],
         contact: {
           name: row['contact_name'],
           contact_phone: row['contact_phone'],
@@ -94,7 +100,10 @@ if @nation && @event_page_path && @page_author_id
     count += 1
     puts "Finished row ##{count} | page_slug is #{row['page_slug']}"
   end
+
+  log.close
+
 else
-  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path} | page_author_id: #{@page_author_id}"
+  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path}"
   puts "Required variabled can be found in config.rb"
 end
