@@ -3,6 +3,7 @@
 require 'nationbuilder'
 require 'pp'
 require 'csv'
+require 'json'
 require 'nokogiri'
 require 'image_downloader'
 require 'fileutils'
@@ -16,7 +17,7 @@ count = 0
 
 log = CSV.open('./files/log.csv', 'w')
 
-if @nation && @basic_page_path && @page_author_id
+if @nation && @basic_page_path
   @counter = CSV.open(@blog_post_path, headers: true).count
   puts "Starting with #{@counter} rows"
 
@@ -33,7 +34,8 @@ if @nation && @basic_page_path && @page_author_id
     page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
     live_page_to_import = row['external_url']
     external_id = row['external_id']
-
+    page_author = row['author_email']
+    
     content_html = Nokogiri::HTML(row['content_html'])
     content_flip_html = Nokogiri::HTML(row['content_flip_html'])
     
@@ -43,6 +45,11 @@ if @nation && @basic_page_path && @page_author_id
 
     fix_image_path_from_file(content_html)
     fix_image_path_from_file(content_flip_html)
+
+    # Find the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
 
     # Set the body of the blog post
     blog_post_params = {
@@ -57,7 +64,7 @@ if @nation && @basic_page_path && @page_author_id
         tags: page_tags,
         published_at: created_at,
         external_id: external_id,
-        author_id: @page_author_id
+        author_id: JSON.parse(author.body)['person']['id']
       }
     }
 
@@ -79,7 +86,10 @@ if @nation && @basic_page_path && @page_author_id
     count += 1
     puts "Finished row ##{count} | page_slug is #{page_slug}"
   end
+
+  log.close
+
 else
-  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path} | page_author_id: #{@page_author_id}"
+  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path}"
   puts "Required variabled can be found in config.rb"
 end
