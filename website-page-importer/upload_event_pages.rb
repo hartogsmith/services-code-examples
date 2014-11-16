@@ -1,12 +1,5 @@
 #!/usr/bin/env ruby-2.1.0
 
-require 'nationbuilder'
-require 'pp'
-require 'csv'
-require 'nokogiri'
-require 'image_downloader'
-require 'fileutils'
-require 'base64'
 require './nb.rb'
 require './config.rb'
 
@@ -14,7 +7,7 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
-log = CSV.open('./files/log.csv', 'w')
+log = CSV.open("./files/events_log_#{@site_slug}.csv", "w")
 
 if @nation && @event_page_path && @page_author_id
   counter = CSV.open(@event_page_path, headers: true).count
@@ -32,10 +25,19 @@ if @nation && @event_page_path && @page_author_id
     local_target = FileUtils::mkdir_p("./images/#{page_slug}").first 
     live_page_to_import = row['external_url']
 
+    page_author = row['author_email']
+    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
+
     
     download_images_from_site(live_page_to_import, local_target)
 
     fix_image_path_from_file(content_html)
+
+    # Find or creates the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+    author_id = JSON.parse(author.body)['person']['id']
 
     event_page_params = {
       site_slug: @site_slug,
@@ -47,9 +49,9 @@ if @nation && @event_page_path && @page_author_id
         start_time: row['start_time'],
         end_time: row['end_time'],
         intro: content_html,
-        tags: row['page_tags'].gsub(/\s+/, "").split(','),
+        tags: page_tags,
         published_at: Time.now,
-        author_id: @page_author_id,
+        author_id: author_id,
         contact: {
           name: row['contact_name'],
           contact_phone: row['contact_phone'],

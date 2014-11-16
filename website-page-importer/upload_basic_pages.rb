@@ -1,12 +1,5 @@
 #!/usr/bin/env ruby-2.1.0
 
-require 'nationbuilder'
-require 'pp'
-require 'csv'
-require 'nokogiri'
-require 'image_downloader'
-require 'fileutils'
-require 'base64'
 require './nb.rb'
 require './config.rb'
 
@@ -14,7 +7,9 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
-if @nation && @basic_page_path && @page_author_id
+log = CSV.open("./files/basic_log_#{@site_slug}.csv", "w")
+
+if @nation && @basic_page_path
   @counter = CSV.open(@basic_page_path, headers: true).count
   puts "Starting with #{@counter} rows"
 
@@ -39,6 +34,13 @@ if @nation && @basic_page_path && @page_author_id
     download_images_from_site(live_page_to_import, local_target)
     fix_image_path_from_file(content_html)
 
+
+    # Find or creates the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+    author_id = JSON.parse(author.body)['person']['id']
+
     # Set the body of the blog post
     basic_page_params = {
       site_slug: @site_slug, 
@@ -50,7 +52,8 @@ if @nation && @basic_page_path && @page_author_id
         tags: page_tags,
         published_at: created_at,
         external_id: external_id,
-        author_id: @page_author_id
+        author_id: author_id,
+        headline: headline
       }
     }
 

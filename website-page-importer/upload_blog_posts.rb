@@ -1,12 +1,6 @@
 #!/usr/bin/env ruby-2.1.0
 
-require 'nationbuilder'
-require 'pp'
-require 'csv'
-require 'nokogiri'
-require 'image_downloader'
-require 'fileutils'
-require 'base64'
+
 require './nb.rb'
 require './config.rb'
 
@@ -14,7 +8,7 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
-log = CSV.open('./files/log.csv', 'w')
+log = CSV.open("./files/posts_log_#{@site_slug}.csv", "w")
 
 if @nation && @basic_page_path && @page_author_id
   @counter = CSV.open(@blog_post_path, headers: true).count
@@ -44,6 +38,13 @@ if @nation && @basic_page_path && @page_author_id
     fix_image_path_from_file(content_html)
     fix_image_path_from_file(content_flip_html)
 
+
+    # Find the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+    author_id = JSON.parse(author.body)['person']['id']
+
     # Set the body of the blog post
     blog_post_params = {
       site_slug: @site_slug,
@@ -57,7 +58,7 @@ if @nation && @basic_page_path && @page_author_id
         tags: page_tags,
         published_at: created_at,
         external_id: external_id,
-        author_id: @page_author_id
+        author_id: author_id
       }
     }
 
