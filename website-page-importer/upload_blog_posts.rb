@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby-2.1.0
 
-
 require './nb.rb'
 require './config.rb'
 
@@ -10,7 +9,7 @@ count = 0
 
 log = CSV.open("./files/posts_log_#{@site_slug}_#{@offset}.csv", "w")
 
-if @nation && @basic_page_path && @page_author_id
+if @nation && @basic_page_path
   @counter = CSV.open(@blog_post_path, headers: true).count
   puts "Starting with #{@counter} rows"
 
@@ -24,9 +23,10 @@ if @nation && @basic_page_path && @page_author_id
     name = row['title']
     page_slug = "#{row['slug']}_#{Time.now.month}_#{Time.now.day}_#{Time.now.year}_#{Time.now.hour}#{Time.now.min}"
     created_at = row['created_at'] rescue Time.now
-    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
+    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
     live_page_to_import = row['external_url']
     external_id = row['external_id']
+    blog_id = row['parent_id']
 
     content_html = Nokogiri::HTML(row['content_html'])
     content_flip_html = Nokogiri::HTML(row['content_flip_html'])
@@ -48,7 +48,7 @@ if @nation && @basic_page_path && @page_author_id
     # Set the body of the blog post
     blog_post_params = {
       site_slug: @site_slug,
-      blog_id: @blog_id, 
+      blog_id: blog_id, 
       blog_post: {
         name: name,
         slug: page_slug,

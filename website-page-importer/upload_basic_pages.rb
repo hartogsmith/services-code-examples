@@ -23,7 +23,7 @@ if @nation && @basic_page_path
     name = row['title']
     page_slug = "#{row['slug']}_#{Time.now.month}_#{Time.now.day}_#{Time.now.year}_#{Time.now.hour}#{Time.now.min}"
     created_at = row['created_at'] rescue Time.now
-    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
+    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
     live_page_to_import = row['external_url']
     excerpt = row['excerpt']
     external_id = row['external_id']

@@ -9,7 +9,7 @@ count = 0
 
 log = CSV.open("./files/events_log_#{@site_slug}_#{@offset}.csv", "w")
 
-if @nation && @event_page_path && @page_author_id
+if @nation && @event_page_path
   counter = CSV.open(@event_page_path, headers: true).count
   puts "Starting with #{counter} rows"
 
@@ -26,7 +26,7 @@ if @nation && @event_page_path && @page_author_id
     live_page_to_import = row['external_url']
 
     page_author = row['author_email']
-    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
+    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
 
     
     download_images_from_site(live_page_to_import, local_target)
