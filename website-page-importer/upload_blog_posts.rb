@@ -8,7 +8,7 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
-log = CSV.open("./files/posts_log_#{@site_slug}.csv", "w")
+log = CSV.open("./files/posts_log_#{@site_slug}_#{@offset}.csv", "w")
 
 if @nation && @basic_page_path && @page_author_id
   @counter = CSV.open(@blog_post_path, headers: true).count

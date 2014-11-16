@@ -7,7 +7,7 @@ set_data_paths
 connect_nation(@site_slug, @token)
 count = 0
 
-log = CSV.open("./files/basic_log_#{@site_slug}.csv", "w")
+log = CSV.open("./files/basic_log_#{@site_slug}_#{@offset}.csv", "w")
 
 if @nation && @basic_page_path
   @counter = CSV.open(@basic_page_path, headers: true).count
