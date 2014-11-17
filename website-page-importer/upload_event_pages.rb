@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby-2.1.0
-
 require './nb.rb'
 require './config.rb'
 
@@ -104,5 +102,5 @@ if @nation && @event_page_path
 
 else
   puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path}"
-  puts "Required variabled can be found in config.rb"
+  puts "Required variables can be found in config.rb"
 end

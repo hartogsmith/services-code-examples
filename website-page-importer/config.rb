@@ -18,7 +18,8 @@ def set_data_paths
   @token = ''
   @blog_post_path = './files/file.csv'
   @basic_page_path ='./files/file.csv'
-  @event_page_path ='./files/file.csv'
+  @event_page_path = './files/file.csv'
+  @profile_page_path = './files/file.csv'
   @calendar_id = 1
   @offset = 0
 end
