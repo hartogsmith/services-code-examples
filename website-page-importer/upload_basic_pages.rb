@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby-2.1.0
-
 require './nb.rb'
 require './config.rb'
 
