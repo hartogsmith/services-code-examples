@@ -4,7 +4,7 @@ require './nb.rb'
 require './config.rb'
 
 set_data_paths
-connect_nation(@site_slug, @token)
+connect_nation(@slug, @token)
 count = 0
 
 log = CSV.open("./files/basic_log_#{@site_slug}_#{@offset}.csv", "w")
@@ -21,12 +21,14 @@ if @nation && @basic_page_path
     end
 
     name = row['title']
-    page_slug = "#{row['slug']}_#{Time.now.month}_#{Time.now.day}_#{Time.now.year}_#{Time.now.hour}#{Time.now.min}"
+    page_slug = row['page_slug'].strip
     created_at = row['created_at'] rescue Time.now
     page_tags = row['page_tags'].split(',').each {|t| t.strip!}
     live_page_to_import = row['external_url']
     excerpt = row['excerpt']
     external_id = row['external_id']
+    page_author = row['page_author']
+    headline = row['title']
 
     content_html = Nokogiri::HTML(row['content_html'])
     local_target = FileUtils::mkdir_p("./images/#{page_slug}").first
@@ -36,10 +38,14 @@ if @nation && @basic_page_path
 
 
     # Find or creates the author by email from the csv
-    author = find_or_create_signup_by_email(page_author)
-    log << [count, author.status, author.reason, author.body] if author
-    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
-    author_id = JSON.parse(author.body)['person']['id']
+    if page_author
+      author = find_or_create_signup_by_email(page_author)
+      log << [count, author.status, author.reason, author.body] if author
+      puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+      author_id = JSON.parse(author.body)['person']['id']
+    else
+      author_id = nil
+    end
 
     # Set the body of the blog post
     basic_page_params = {
@@ -58,12 +64,14 @@ if @nation && @basic_page_path
     }
 
     api_call = create_basic_page(basic_page_params)
+    log << [count, api_call.status, api_call.reason, api_call.body] if api_call
     puts "#{api_call.status} | #{api_call.reason}"
 
     Dir.foreach(local_target) do |filename|
       unless filename == '.' || filename == '..' || filename == '.DS_Store'
         encoded_image = encode_image(local_target, filename)
           api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
+        log << [count, api_call.status, filename, api_call.body] if api_call  
         puts "#{api_call.status} | #{api_call.reason}"
       end
     end
