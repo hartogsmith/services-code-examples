@@ -1,5 +1,16 @@
 #!/usr/bin/env ruby-2.1.0
 
+<<<<<<< HEAD
+=======
+require 'nationbuilder'
+require 'pp'
+require 'csv'
+require 'json'
+require 'nokogiri'
+require 'image_downloader'
+require 'fileutils'
+require 'base64'
+>>>>>>> master
 require './nb.rb'
 require './config.rb'
 
@@ -26,9 +37,14 @@ if @nation && @basic_page_path
     page_tags = row['page_tags'].split(',').each {|t| t.strip!}
     live_page_to_import = row['external_url']
     external_id = row['external_id']
+<<<<<<< HEAD
     blog_id = row['parent_id']
     page_author = row['page_author']
 
+=======
+    page_author = row['author_email']
+    
+>>>>>>> master
     content_html = Nokogiri::HTML(row['content_html'])
     content_flip_html = Nokogiri::HTML(row['content_flip_html'])
     
@@ -39,6 +55,7 @@ if @nation && @basic_page_path
     fix_image_path_from_file(content_html)
     fix_image_path_from_file(content_flip_html)
 
+<<<<<<< HEAD
 
     # Find the author by email from the csv
     if page_author
@@ -49,6 +66,12 @@ if @nation && @basic_page_path
     else
       author_id = nil
     end
+=======
+    # Find the author by email from the csv
+    author = find_or_create_signup_by_email(page_author)
+    log << [count, author.status, author.reason, author.body] if author
+    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+>>>>>>> master
 
     # Set the body of the blog post
     blog_post_params = {
@@ -63,7 +86,11 @@ if @nation && @basic_page_path
         tags: page_tags,
         published_at: created_at,
         external_id: external_id,
+<<<<<<< HEAD
         author_id: author_id
+=======
+        author_id: JSON.parse(author.body)['person']['id']
+>>>>>>> master
       }
     }
 
@@ -85,7 +112,10 @@ if @nation && @basic_page_path
     count += 1
     puts "Finished row ##{count} | page_slug is #{page_slug}"
   end
+
+  log.close
+
 else
-  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path} | page_author_id: #{@page_author_id}"
+  puts "Script cannot be run - nation: #{@nation} | basic_page_path: #{@basic_page_path}"
   puts "Required variabled can be found in config.rb"
 end
