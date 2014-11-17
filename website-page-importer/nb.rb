@@ -1,3 +1,11 @@
+require 'json'
+require 'pp'
+require 'csv'
+require 'time'
+require 'nokogiri'
+require 'image_downloader'
+require 'fileutils'
+require 'base64'
 require 'nationbuilder'
 require 'restclient'
 

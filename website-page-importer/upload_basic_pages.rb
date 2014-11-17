@@ -1,22 +1,13 @@
 #!/usr/bin/env ruby-2.1.0
 
-require 'nationbuilder'
-require 'json'
-require 'pp'
-require 'csv'
-require 'time'
-require 'nokogiri'
-require 'image_downloader'
-require 'fileutils'
-require 'base64'
 require './nb.rb'
 require './config.rb'
 
 set_data_paths
-connect_nation(@site_slug, @token)
+connect_nation(@slug, @token)
 count = 0
 
-log = CSV.open('./files/basic_page_log.csv', 'w')
+log = CSV.open("./files/basic_log_#{@site_slug}_#{@offset}.csv", "w")
 
 if @nation && @basic_page_path
   @counter = CSV.open(@basic_page_path, headers: true).count
@@ -30,16 +21,14 @@ if @nation && @basic_page_path
     end
 
     name = row['title']
-    page_slug = row['slug']
-    created_at = Time.parse(row['created_at']) rescue Time.now
-    page_tags = row['page_tags'].gsub(/\s+/, "").split(',')
-    live_page_to_import = row['source_url']
+    page_slug = row['page_slug'].strip
+    created_at = row['created_at'] rescue Time.now
+    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
+    live_page_to_import = row['external_url']
     excerpt = row['excerpt']
     external_id = row['external_id']
-    headline = row['headline']
-    excerpt = row['excerpt']
-    page_author = row['author_email']
-
+    page_author = row['page_author']
+    headline = row['title']
     additional_attachment = row['attachment_url']
 
     content_html = Nokogiri::HTML(row['content_html'])
@@ -51,10 +40,16 @@ if @nation && @basic_page_path
 
     fix_image_path_from_file(content_html)
 
+
     # Find or creates the author by email from the csv
-    author = find_or_create_signup_by_email(page_author)
-    log << [count, author.status, author.reason, author.body] if author
-    puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+    if page_author
+      author = find_or_create_signup_by_email(page_author)
+      log << [count, author.status, author.reason, author.body] if author
+      puts "#{author.status} | #{author.reason} | author_id #{JSON.parse(author.body)['person']['id']}"
+      author_id = JSON.parse(author.body)['person']['id']
+    else
+      author_id = nil
+    end
 
     # Set the body of the blog post
     basic_page_params = {
@@ -67,7 +62,7 @@ if @nation && @basic_page_path
         tags: page_tags,
         published_at: created_at,
         external_id: external_id,
-        author_id: JSON.parse(author.body)['person']['id'],
+        author_id: author_id,
         headline: headline
       }
     }
