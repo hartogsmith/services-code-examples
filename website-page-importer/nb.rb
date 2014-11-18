@@ -30,7 +30,7 @@ def download_single_image_from_url(url_path, local_target)
       output.write RestClient.get(url_path)
     end
   rescue => e
-    puts "Link is broken, no image downloaded"
+    puts "Link is broken, no image downloaded => #{url_path}"
   end
 end
 
