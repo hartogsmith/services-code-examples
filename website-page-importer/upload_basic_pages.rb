@@ -30,7 +30,7 @@ if @nation && @basic_page_path
     additional_attachment = row['attachment_url']
 
     content_html = Nokogiri::HTML(row['content_html'])
-    local_target = FileUtils::mkdir_p("./images/#{page_slug}").first
+    local_target = FileUtils::mkdir_p("./images/#{page_slug}_#{count}").first
     
     # Download files off live site(s)
     download_images_from_site(live_page_to_import, local_target)

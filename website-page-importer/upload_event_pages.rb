@@ -20,7 +20,7 @@ if @nation && @event_page_path
 
     page_slug = row['page_slug'].strip
     content_html = Nokogiri::HTML(row['content_html'])    
-    local_target = FileUtils::mkdir_p("./images/#{page_slug}").first 
+    local_target = FileUtils::mkdir_p("./images/#{page_slug}_#{count}").first 
     live_page_to_import = row['external_url']
     calendar_id = row['calendar_id']
     page_author = row['author_email']

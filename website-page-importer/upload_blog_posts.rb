@@ -30,7 +30,7 @@ if @nation && @basic_page_path
     content_html = Nokogiri::HTML(row['content_html'])
     content_flip_html = Nokogiri::HTML(row['content_flip_html'])
     
-    local_target = FileUtils::mkdir_p("./images/#{page_slug}").first
+    local_target = FileUtils::mkdir_p("./images/#{page_slug}_#{count}").first
     
     download_images_from_site(live_page_to_import, local_target)
 
