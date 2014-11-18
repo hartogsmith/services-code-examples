@@ -30,7 +30,7 @@ if @nation && @basic_page_path
     additional_attachment = row['attachment_url']
 
     content_html = Nokogiri::HTML(row['content_html'])
-    local_target = FileUtils::mkdir_p("./images/#{page_slug}").first
+    local_target = FileUtils::mkdir_p("./images/#{page_slug}_#{count}").first
     
     # Download files off live site(s)
     download_images_from_site(live_page_to_import, local_target)
@@ -71,9 +71,9 @@ if @nation && @basic_page_path
 
     Dir.foreach(local_target) do |filename|
       unless filename == '.' || filename == '..' || filename == '.DS_Store'
-        encoded_image = encode_image(local_target, filename)
-          api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
-          log << [count, api_call.status, api_call.reason, api_call.body] if api_call
+        encoded_file = encode_file(local_target, filename)
+        api_call = upload_file(encoded_file, filename, @site_slug, page_slug)
+        log << [count, api_call.status, api_call.reason, api_call.body] if api_call
         puts "#{api_call.status} | #{api_call.reason}"
       end
     end

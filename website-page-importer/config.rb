@@ -5,10 +5,10 @@
 # For basic pages add 'content_html', 'excerpt'
 # File must also use encoding 'utf-8'
 #
-# @site_slug is the slug for the nation
+# @slug is the slug of your nation
+# @site_slug is the slug of the website of the nation to load data to
 # @token is the api token that can be created at 'Settings' > 'Developer' > 'API Token'
-# @blog_post_path and @basic_page_path are the paths where your csv(s) are located, by default it will be in the 'files' directory that is a part of this importer
-# @blog_id is the id of the blog to add these posts to - you can list all blogs on your site using the API explorer (http://apiexplorer.nationbuilder.com/nationbuilder) or following instructions here: http://nationbuilder.com/blogs_api
+# @_____page_path is the local path of the csv for the data to upload
 # @offset = offset for the file in case script quits out during the import
 #
 
@@ -20,6 +20,7 @@ def set_data_paths
   @basic_page_path ='./files/file.csv'
   @event_page_path = './files/file.csv'
   @profile_page_path = './files/file.csv'
+  @file_attachments_path = './files/file.csv'
   @calendar_id = 1
   @offset = 0
 end

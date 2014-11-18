@@ -30,7 +30,7 @@ def download_single_image_from_url(url_path, local_target)
       output.write RestClient.get(url_path)
     end
   rescue => e
-    puts "Link is broken, no image downloaded"
+    puts "Link is broken, no image downloaded => #{url_path}"
   end
 end
 
@@ -84,7 +84,7 @@ def find_or_create_signup_by_email(email)
     })
 end
 
-def upload_file(encoded_image, filename, site_slug, page_slug)
+def upload_file(encoded_file, filename, site_slug, page_slug)
   @nation.call(
     :page_attachments,
     :create,
@@ -95,13 +95,13 @@ def upload_file(encoded_image, filename, site_slug, page_slug)
         filename: filename,
         content_type: 'image/jpeg',
         updated_at: Time.now,
-        content: encoded_image
+        content: encoded_file
       }
     })
 end
 
-def encode_image(local_target, file)
-  File.open("#{local_target}/#{file}", 'r') do |image_file|  
-    Base64.encode64(image_file.read).gsub(/\s+/, "")
+def encode_file(local_target, file)
+  File.open("#{local_target}/#{file}", 'r') do |raw_file|  
+    Base64.encode64(raw_file.read).gsub(/\s+/, "")
   end
 end
