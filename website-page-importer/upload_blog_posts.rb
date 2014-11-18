@@ -71,8 +71,8 @@ if @nation && @basic_page_path
     if api_call
       Dir.foreach(local_target) do |filename|
         unless filename == '.' || filename == '..' || filename == '.DS_Store'
-          encoded_image = encode_image(local_target, filename)
-            api_call = upload_file(encoded_image, filename, @site_slug, page_slug)
+          encoded_file = encode_file(local_target, filename)
+          api_call = upload_file(encoded_file, filename, @site_slug, page_slug)
           log << [count, api_call.status, filename, api_call.body] if api_call
           puts "#{api_call.status} | #{api_call.reason}"
         end
