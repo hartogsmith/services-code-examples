@@ -24,7 +24,7 @@ if @nation && @event_page_path
     live_page_to_import = row['external_url']
     calendar_id = row['calendar_id']
     page_author = row['author_email']
-    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
+    page_tags = row['page_tags'].to_s.split(',').each {|t| t.strip!}
 
     download_images_from_site(live_page_to_import, local_target)
 

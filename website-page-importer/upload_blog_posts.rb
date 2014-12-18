@@ -21,7 +21,7 @@ if @nation && @basic_page_path
     name = row['title']
     page_slug = row['page_slug'].strip
     created_at = row['created_at'] rescue Time.now
-    page_tags = row['page_tags'].split(',').each {|t| t.strip!}
+    page_tags = row['page_tags'].to_s.split(',').each {|t| t.strip!}
     live_page_to_import = row['external_url']
     external_id = row['external_id']
     blog_id = row['parent_id']
