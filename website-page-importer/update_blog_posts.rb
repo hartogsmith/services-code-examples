@@ -17,7 +17,7 @@ if @nation && @update_blog_post_path
       count += 1
       next
     end
-# api returns data shaped like:
+# using csv based on api-returned data shaped like:
 # id,content_before_flip,slug,path,status,site_slug,name,
 # headline,title,excerpt,author_id,published_at,external_id,tags    
 
@@ -47,8 +47,8 @@ if @nation && @update_blog_post_path
     #fix_image_path_from_file(content_html)
     #fix_image_path_from_file(content_flip_html)
 
-    # Find the author by email from the csv
     # we are using valid author ids here, no need for this
+    # Find the author by email from the csv
     # if page_author
     #  author = find_or_create_signup_by_email(page_author)
     #  log << [count, author.status, author.reason, author.body] if author
